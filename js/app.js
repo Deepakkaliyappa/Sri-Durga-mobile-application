@@ -219,7 +219,12 @@ function saveModal() {
     alert("Please enter an item name.");
     return;
   }
-
+  // Rate / Total Price is mandatory
+  if (priceRaw === "" || isNaN(parseFloat(priceRaw))) {
+    alert("Enter amount");
+    document.getElementById("p_price").focus();
+    return;
+  }
   rememberNewItem(name);
 
   if (editId) {
