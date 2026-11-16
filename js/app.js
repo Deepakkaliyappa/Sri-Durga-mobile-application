@@ -368,8 +368,8 @@ const CARRY_ROWS_WITH_TOTALS = 0;
 
 // Row limits per page (measured height can still lower these, never raise them).
 // Row limits per page (measured height can still lower these, never raise them).
-const MAX_ROWS_PER_PAGE = 17;       // Page 2 and onwards can fit up to 15 items
-const ROWS_BOTH_ADJ = 17;           // Last page: totals group has Discount AND Advance
+const MAX_ROWS_PER_PAGE = 15;       // Page 2 and onwards can fit up to 15 items
+const ROWS_BOTH_ADJ = 14;           // Last page: totals group has Discount AND Advance
 const ROWS_ONE_ADJ = 15;            // Last page: only one of Discount / Advance entered
 const ROWS_NO_ADJ = 15;             // Last page: neither entered (Subtotal + Balance only)
 
