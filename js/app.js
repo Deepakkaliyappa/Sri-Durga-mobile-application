@@ -366,17 +366,19 @@ const PAGE_TRIM_MM = 0.5;
 // Set to 0 if you want totals alone on the next page.
 const CARRY_ROWS_WITH_TOTALS = 0;
 
-// Row limits per page (measured height can still lower these, never raise them).
-// Row limits per page (measured height can still lower these, never raise them).
-const MAX_ROWS_PER_PAGE = 15;       // Page 2 and onwards can fit up to 15 items
-const ROWS_BOTH_ADJ = 14;           // Last page: totals group has Discount AND Advance
-const ROWS_ONE_ADJ = 15;            // Last page: only one of Discount / Advance entered
-const ROWS_NO_ADJ = 15;             // Last page: neither entered (Subtotal + Balance only)
+// Row limits per page (the measured height can still lower these, never raise them).
+const MAX_ROWS_FIRST_PAGE = 15;   // Page 1, when more pages follow (no totals on it)
+const MAX_ROWS_PER_PAGE   = 20;   // Page 2, 3, ... when more pages follow
 
-// How many item rows may share a page with the totals group.
-function rowsWithTotals(d) {
+// Items allowed on a page that also carries the totals block
+const FIRST_PAGE_WITH_TOTALS = { both: 14, one: 15, none: 15 };  // Page 1
+const NEXT_PAGE_WITH_TOTALS  = { both: 17, one: 19, none: 20 };  // Page 2, 3, ...
+
+// both = Discount AND Advance entered, one = only one of them, none = neither
+function rowsWithTotals(d, pageIndex) {
   const n = (d.numDisc > 0 ? 1 : 0) + (d.numAdv > 0 ? 1 : 0);
-  return n === 2 ? ROWS_BOTH_ADJ : n === 1 ? ROWS_ONE_ADJ : ROWS_NO_ADJ;
+  const t = pageIndex === 0 ? FIRST_PAGE_WITH_TOTALS : NEXT_PAGE_WITH_TOTALS;
+  return n === 2 ? t.both : n === 1 ? t.one : t.none;
 }
 
 let renderSeq = 0;
@@ -554,7 +556,7 @@ function paginate(d, fmt, sandbox) {
 
     // 1) Fill rows one by one (a "Continued" note is reserved at the bottom)
       // 1) Fill rows one by one (Page 1 gets 11 max, later pages get MAX_ROWS_PER_PAGE)
-    const currentLimit = pages.length === 0 ? 11 : MAX_ROWS_PER_PAGE;
+    const currentLimit = pages.length === 0 ? MAX_ROWS_FIRST_PAGE : MAX_ROWS_PER_PAGE;
     while (i < items.length && count < currentLimit) {
       const tr = buildRowEl(items[i], i);
       tbody.appendChild(tr);
@@ -571,7 +573,7 @@ function paginate(d, fmt, sandbox) {
     // 2) All items placed -> try to put the totals block on this page
     if (i >= items.length) {
       foot.innerHTML = buildTotalsHTML(d);
-      if ((pageFits(page) && count <= rowsWithTotals(d)) || count === 0) {
+      if ((pageFits(page) && count <= rowsWithTotals(d, pages.length)) || count === 0) {
         isLast = true;
       } else {
         // Totals don't fit here. Move them (and optionally the last row(s)) to the next page.
